@@ -1,114 +1,103 @@
-# Portfolio Website
+# Portfolio Codex Monorepo
 
-Sebuah website portfolio modern yang dibangun dengan React, Tailwind CSS, dan Vite.
+Repositori ini berisi tiga aplikasi terpisah:
 
-## Struktur Proyek
+- rontend/  � website portfolio publik berbasis React + Vite.
+- dmin-app/ � panel admin untuk mengelola konten.
+- ackend/   � REST API Laravel yang melayani data untuk kedua frontend.
 
-```
-src/
-├── assets/         # Gambar, font, dan aset statis
-├── components/     # Komponen React yang dapat digunakan kembali
-│   ├── About/     # Komponen untuk section About
-│   ├── Contact/   # Komponen untuk section Contact
-│   └── index.js   # File barrel untuk ekspor komponen
-├── config/        # File konfigurasi
-│   ├── postcss.config.js    # Konfigurasi PostCSS
-│   ├── tailwind.config.js   # Konfigurasi Tailwind CSS
-│   └── vite.config.js       # Konfigurasi Vite
-├── constants/     # Konstanta dan data statis
-│   └── index.js   # Ekspor konstanta (navigasi, social links)
-├── hooks/         # Custom React hooks
-├── layouts/       # Layout komponen
-│   └── App.jsx    # Layout utama aplikasi
-├── styles/        # File CSS
-│   └── index.css  # File CSS utama dengan Tailwind
-└── utils/         # Fungsi utilitas
-```
+## Struktur Direktori
 
-## Fitur
+`
+frontend/
+  package.json         # Config dan skrip Vite/React
+  src/                 # Sumber website portfolio
+  public/              # Static assets (favicon, icons)
+admin-app/
+  package.json         # Config Vite untuk panel admin
+  src/
+backend/
+  artisan              # Entrypoint Laravel
+  app/                 # Controller, model, request
+  routes/
+  config/
+  database/
+`
 
-- 🎨 Desain modern dan responsif
-- 🌓 Mode gelap/terang
-- ⚡ Performa optimal dengan Vite
-- 🎭 Animasi halus
-- 📱 Mobile-friendly
+## Menjalankan Secara Lokal
 
-## Teknologi
-
-- React
-- Tailwind CSS
-- Vite
-- PostCSS
-
-## Penggunaan File
-
-### Components (src/components/index.js)
-File ini mengekspor semua komponen untuk penggunaan yang lebih bersih:
-```javascript
-export { default as Navbar } from './Navbar';
-export { default as Hero } from './Hero';
-// ... komponen lainnya
-```
-
-### Constants (src/constants/index.js)
-Menyimpan data statis seperti navigasi dan social links:
-```javascript
-export const navLinks = [
-  { id: 'home', title: 'Home', href: '#home' },
-  // ... link lainnya
-];
-```
-
-### Konfigurasi
-
-#### PostCSS (src/config/postcss.config.js)
-Mengatur pemrosesan CSS dengan Tailwind dan Autoprefixer.
-
-#### Tailwind (src/config/tailwind.config.js)
-Konfigurasi tema, animasi, dan font kustom untuk Tailwind CSS.
-
-## Instalasi
-
-1. Clone repositori
-```bash
-git clone [url-repo]
-```
-
-2. Install dependensi
-```bash
+### 1. Frontend (portfolio)
+`ash
+cd frontend
 npm install
-```
-
-3. Jalankan development server
-```bash
 npm run dev
-```
+`
+Aplikasi akan tersedia di http://localhost:5173 (atau port yang ditampilkan Vite).
 
-## Pengembangan
+### 2. Admin Panel
+`ash
+cd admin-app
+npm install
+npm run dev
+`
 
-### Menambah Komponen Baru
-1. Buat komponen di folder `src/components/`
-2. Ekspor komponen di `src/components/index.js`
-3. Import dan gunakan komponen sesuai kebutuhan
+### 3. Backend Laravel
+`ash
+cd backend
+composer install
+cp .env.example .env
+php artisan key:generate
+`
+Selanjutnya isi kredensial database MySQL pada .env kemudian jalankan:
+`ash
+php artisan migrate --seed
+php artisan serve
+`
+API default tersedia di http://127.0.0.1:8000/api.
 
-### Menambah Halaman
-1. Buat komponen halaman di `src/layouts/`
-2. Tambahkan routing jika diperlukan
+## Build & Deploy
 
-### Styling
-- Gunakan Tailwind CSS untuk styling
-- Tambahkan kelas kustom di `src/styles/index.css`
-- Konfigurasi tema di `src/config/tailwind.config.js`
-
-## Build
-
-Untuk membuat versi production:
-```bash
+### Build frontend untuk production
+`ash
+cd frontend
 npm run build
-```
+`
+Folder rontend/dist berisi file statis siap unggah.
 
-## License
+### Build admin untuk production
+`ash
+cd admin-app
+npm run build
+`
 
-MIT License
-"# portfolio-codex" 
-"# portfolio-codex" 
+### Deploy ke Hostinger (ringkas)
+1. **Backend**
+   - Upload folder ackend ke server (mis. ~/domains/namadomain/backend).
+   - Jalankan composer install, cp .env.example .env, php artisan key:generate melalui SSH.
+   - Buat database MySQL via hPanel, isi kredensial pada .env.
+   - Jalankan php artisan migrate --seed.
+   - Atur subdomain (mis. pi.domain.com) dengan document root ackend/public.
+
+2. **Frontend / Admin**
+   - Setelah 
+pm run build, kompres isi folder dist.
+   - Upload dan ekstrak ke public_html (atau subfolder) melalui File Manager.
+   - Pastikan file .htaccess berisi aturan fallback SPA:
+     `
+     Options -MultiViews
+     RewriteEngine On
+     RewriteBase /
+     RewriteCond %{REQUEST_FILENAME} !-f
+     RewriteCond %{REQUEST_FILENAME} !-d
+     RewriteRule . /index.html [L]
+     `
+   - Set environment di rontend/.env.production (mis. VITE_API_BASE_URL=https://api.domain.com/api).
+
+## Catatan Penting
+- Setiap aplikasi memiliki dependensi sendiri; jalankan 
+pm install atau composer install di folder masing-masing.
+- Folder 
+ode_modules/, dist/, dan endor/ sudah masuk .gitignore sehingga tidak tersimpan di Git.
+- Untuk mengganti konfigurasi Tailwind atau Vite, edit file di dalam rontend/ atau dmin-app/ sesuai kebutuhan.
+
+Semoga struktur baru ini memudahkan proses deploy ke Hostinger. ??
